@@ -12,19 +12,19 @@
 
 		<div id="select">
 			<select name="connection-type" id="connection-type">
-				<option value="/dev/ttyS0">COM1</option>
-				<option value="/dev/ttyS1" >COM2</option>
-<!--				<option value="telnet" >telnet</option>-->
+				<option value="/dev/ttyUSB0">ttyUSB0</option>
+				<!--<option value="/dev/ttyS1" >COM2</option>-->
+				<!--				<option value="telnet" >telnet</option>-->
 			</select>
 			<input type="button" value="Connect" name="connect" id="connect">
 
 		</div>
 		<div id="communication">
-			<div id="content"></div>
-			<input type="text" id="input" disabled="disabled" />
+			<textarea id="content"></textarea>
+			<!--<input type="text" id="input" disabled="disabled" />-->
+			<div id="status"></div>
 		</div>
 
-		<div id="status"></div>
     </body>
 </html>
 

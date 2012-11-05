@@ -16,8 +16,8 @@ console.log("Starting server...");
 devices = {
 	'/dev/ttyUSB0': {
 		baudrate: 9600,
-		port: null,
-		parser: serial.parsers.readline("\n") 
+		port: null
+	//parser: serial.parsers.readline("\n") 
 	}
 //	'/dev/ttyS1':
 //	{
@@ -39,7 +39,8 @@ for( var deviceName in devices)
 	devices[deviceName].port = new serial.SerialPort(deviceName, devices[deviceName]);
 	devices[deviceName].port.on("data", function(name) {
 		return function (data) {
-			//console.log("Received " + data.toString());
+			console.log("Received from port");
+			console.log(data);
 			for (var i = 0; i < clients.length; i++) {
 				if (clients[i].portName == name) {
 					var json = JSON.stringify({
@@ -84,7 +85,11 @@ webSocketServer.on("request", function(request) {
 		}
 		else //regular command
 		{
-			devices[connectionObject.portName].port.write(message.utf8Data + "\r\n");
+			var data = JSON.parse(message.utf8Data);
+			var buf = new Buffer(1);
+			buf[0] = data.data;
+			
+			devices[connectionObject.portName].port.write(buf);
 		}
 	});
 	
