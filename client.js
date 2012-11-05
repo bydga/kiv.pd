@@ -17,62 +17,78 @@ $(document).ready(function(){
 	
 	function connect()
 	{
-		window.WebSocket = window.WebSocket || window.MozWebSocket;
 		
-		if (!window.WebSocket) {
-			return;
-		}
+		var socket = io.connect('http://ui505bv01-lps.civ.zcu.cz:1337', {
+			reconnect: false
+		});		
 		
-		setStatus("Connecting to server...");
-		var connection = new WebSocket('ws://ui505bv01-lps.civ.zcu.cz:1337');
+		socket.on('connecting', function () {
+			setStatus("Connecting to server...");
+		});
 		
-		connection.onopen = function () {
-			var port = $('#connection-type option:selected').val(); 
-			setStatus("Connected. Sending request for " + port );
-			connection.send(port);
-		
-		};
-		
-		connection.onerror = function (error) {
+		socket.on('connect_failed', function () {
 			setStatus('Sorry, but there\'s some problem with your connection or the server is down.');
-		};
+		});
 		
-		connection.onmessage = function (message) {
-			try {
-				var json = JSON.parse(message.data);
-				if (json.connection == "ok") {
-					setStatus("Connection ready. Type command.");
-				}
-				else if (json.type === 'message') {
-					
-					if ( json.data == "\b") {
-						content.val(content.val().replace(/.$/, ""));
-					}
-					else if (json.data == " \b") {
+		socket.on('connect', function () {
+			setStatus("Connected to server, sending desired port request.");
+			socket.emit('connectTo', {
+				port: $('#connection-type option:selected').val()
+			});
+		});
+		
+		socket.on('error', function () {
+			setStatus('Sorry, but there\'s some problem with your connection or the server is down.');
+		});
+		
+		socket.on('disconnect', function () {
+			setStatus('Sorry, but there\'s some problem with your connection or the server is down.');
+		});
+		
+		socket.on('reconnecting', function () {
+			setStatus('Connection to server lost, trying to reconnect');
+		});
+		
+		socket.on('reconnect', function () {
+			setStatus('Reconnected. Type command.');
+		});
+		
+		socket.on('reconnect_failed', function () {
+			setStatus('Reconnect failed. Try to reload the page.');
+		});
+		
+		socket.on('connectTo', function (data) {
+			if (data.result == "ok") {
+				setStatus("Connection ready. Type command.");
+			}
+			else {
+				setStatus('Sorry, Connection to this port rejected');
+			}
+		});
+			
+		socket.on('message', function (data) {
+			if ( data.content == "\b") {
+				content.val(content.val().replace(/.$/, ""));
+			}
+			else if (data.content == " \b") {
 						
-					}
-					else
-					{
-						content.val(content.val() + json.data);
-						setStatus("Type command.");
-					}
-				}
-				
-				content.scrollTop(100000);
-			} catch (e) {
-				setStatus('Got unexpected data from server.');
-				return;
-			}			
-		};
+			}
+			else {
+				content.val(content.val() + data.content);
+				setStatus("Type command.");
+			}
+			content.scrollTop(100000);
+		});
 		
 		
 		//for special characters
 		content.keydown(function(e) {
 			
+			console.log("keydown " + e.which);
 			if (e.which == 8 || e.which == 9) {   // backspace, tab
-				connection.send(JSON.stringify({
+				socket.emit('message', {
 					data: e.which
-				}));
+				});
 				e.preventDefault();
 			}
 			
@@ -84,17 +100,14 @@ $(document).ready(function(){
 		
 		//regular chars
 		content.keypress(function(e) {
-			connection.send(JSON.stringify({
-				data: e.which
-			}));
-			e.preventDefault();
-		});
-		
-		setInterval(function() {
-			if (connection.readyState !== 1) {
-				setStatus('Unable to comminucate with the WebSocket server.');
+			if (e.which > 9) {
+				
+				console.log("keypress " + e.which);
+				socket.emit('message', {
+					data: e.which
+				});
+				e.preventDefault();
 			}
-		}, 3000);
-	
+		});
 	}
 });

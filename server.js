@@ -1,17 +1,13 @@
-var WebSocket = require("websocket").server;
-var http = require("http");
-var serial = require("serialport");
-var repl = require("repl");
+var http = require('http').createServer(function(req, res) {}),
+io = require('socket.io').listen(http, {
+	'log level':2	
+}),
+serial = require("serialport"),
+repl = require("repl");
 
-
-//  serial.list(function (err, ports) {
-//    ports.forEach(function(port) {
-//      console.log(port);
-//    });
-//  });
-//  
 
 console.log("Starting server...");
+http.listen(1337);
 //   available additional config properties: databits, stopbits, parity
 devices = {
 	'/dev/ttyUSB0': {
@@ -28,26 +24,18 @@ devices = {
 var allowedOrigins = ["http://ui505bv01-lps.civ.zcu.cz" ];
 clients = [];
 
-var httpServer = http.createServer(function(req, res) {}).listen(1337, function() { });
-var webSocketServer = new WebSocket({
-	httpServer: httpServer
-});
-
 //init port devices
 for( var deviceName in devices)
 {
 	devices[deviceName].port = new serial.SerialPort(deviceName, devices[deviceName]);
 	devices[deviceName].port.on("data", function(name) {
 		return function (data) {
-			console.log("Received from port");
-			console.log(data);
 			for (var i = 0; i < clients.length; i++) {
 				if (clients[i].portName == name) {
-					var json = JSON.stringify({
-						type: "message", 
-						data: data.toString()
+					
+					clients[i].socket.emit("message", {
+						content: data.toString()
 					});
-					clients[i].socket.sendUTF(json);
 				}
 			}
 		}
@@ -56,49 +44,36 @@ for( var deviceName in devices)
 
 console.log("Devices opened");
 
-webSocketServer.on("request", function(request) {
-	if (allowedOrigins.length > 0 && allowedOrigins.indexOf(request.origin) == -1) {
-		request.reject(); 
-		console.log("rejected client from " + request.origin);
-		return;
-	}
-		
+io.sockets.on('connection', function (socket) {
 	var connectionObject = {
-		socket: request.accept(null, request.origin),
+		socket: socket,
 		portName: null
 	};
 	
 	var index = clients.push(connectionObject) -1;
-	
-	//incomming message from one of the clients
-	connectionObject.socket.on("message", function(message) {
-		
-		if (connectionObject.portName == null) { //first message from user is the protocol
-			connectionObject.portName = message.utf8Data;
-			
-			var json = JSON.stringify({
-				connection: "ok"
-			});
-			
-			connectionObject.socket.sendUTF(json);
-			console.log("Client connected to port " + connectionObject.portName);
-		}
-		else //regular command
-		{
-			var data = JSON.parse(message.utf8Data);
-			var buf = new Buffer(1);
-			buf[0] = data.data;
-			
-			devices[connectionObject.portName].port.write(buf);
-		}
+  
+	socket.on('connectTo', function (data) {
+    
+		connectionObject.portName = data.port;
+		console.log("Client connected to port " + connectionObject.portName);
+		socket.emit('connectTo', {
+			result: "ok"
+		});
 	});
 	
+	socket.on('message', function (data) {
+    
+		var buf = new Buffer(1);
+		buf[0] = data.data;
+			
+		devices[connectionObject.portName].port.write(buf);
+	});
 	//client disconnects, remove him
-	connectionObject.socket.on("close", function(connection) {
+	socket.on("disconnect", function() {
 		clients.splice(index,1);
 		console.log("client disconnected from " + connectionObject.portName);
 	});
 });
 
 console.log("Server accepting connections.");
-repl.start("commands> ");
+repl.start("nodejs> ");
