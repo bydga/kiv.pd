@@ -1,0 +1,10 @@
+sudo su
+apt-get install python g++ make
+wget http://nodejs.org/dist/v0.8.14/node-v0.8.14.tar.gz
+tar xvzf node-v0.8.14.tar.gz
+cd node-v0.8.14
+./configure
+make install
+cd /home/user/serialport
+npm install serialport
+npm install socket.io

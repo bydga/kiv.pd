@@ -1,21 +1,62 @@
-var http = require('http').createServer(function(req, res) {}),
+var fs = require('fs'), path = require('path'),
+http = require('http').createServer(function(request, response) { 
+	var filePath = '.' + request.url;
+	if (filePath == './')
+		filePath = './index.html';
+         
+	var extname = path.extname(filePath);
+	var contentType = 'text/html';
+	switch (extname) {
+		case '.js':
+			contentType = 'text/javascript';
+			break;
+		case '.css':
+			contentType = 'text/css';
+			break;
+	}
+     
+	fs.exists(filePath, function(exists) {
+     
+		if (exists) {
+			fs.readFile(filePath, function(error, content) {
+				if (error) {
+					response.writeHead(500);
+					response.end();
+				}
+				else {
+					response.writeHead(200, {
+						'Content-Type': contentType
+					});
+					response.end(content, 'utf-8');
+				}
+			});
+		}
+		else {
+			response.writeHead(404);
+			response.end();
+		}
+	});
+}),
 io = require('socket.io').listen(http, {
-	'log level':2	
+	'browser client minification': true,
+	'browser client etag': true,
+	'browser client gzip': true,
+	'log level':1	
 }),
 serial = require("serialport"),
 repl = require("repl");
 
 
 console.log("Starting server...");
-http.listen(1337);
+http.listen(80);
 //   available additional config properties: databits, stopbits, parity
 devices = {
 	'/dev/ttyUSB0': {
 		baudrate: 9600,
-		port: null
-	//parser: serial.parsers.readline("\n") 
+		port: null,
+		readableName: "ttyUSB0"
 	}
-//	'/dev/ttyS1':
+//	,'/dev/ttyS1':
 //	{
 //		baudrate: 9600,
 //		port: null
@@ -51,6 +92,17 @@ io.sockets.on('connection', function (socket) {
 	};
 	
 	var index = clients.push(connectionObject) -1;
+	
+	var devs = []
+	for (var name in devices) {
+		devs.push({
+			key: name, 
+			readable: devices[name].readableName
+		});
+	}
+	socket.emit("options", {
+		data: devs
+	});
   
 	socket.on('connectTo', function (data) {
     
