@@ -1,25 +1,12 @@
 * { font-size:12px; padding:0px; margin:0px; }
 
-#content {display: block; resize: none; width:500px; margin:10px auto 10px auto; padding:5px; background:#ddd; border-radius:5px;
+#content {display: block; resize: none; width:98%; padding:5px; background:#ddd; border-radius:5px;
 		  border:1px solid #CCC; font-family: Courier New; color: #0C0; 
-		  background-color: black; font-weight: bold; height: 200px; overflow: auto;  }
-#input { background-color: black; color: #0C0; font-weight: bold; display: block; border-radius:2px; border:1px solid #ccc; margin: auto; padding:5px; width:500px; font-family: Courier New;  }
+		  background-color: black; font-weight: bold; height: 400px; overflow: auto;  }
 
 
-#communication
-{
-	display: none;
-}
-
-#select
-{
-	width: 130px;
-	margin: 200px auto 0 auto;
-}
 
 #status
 {
-    margin: auto;
     padding: 5px;
-    width: 500px;
 }

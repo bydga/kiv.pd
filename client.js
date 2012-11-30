@@ -1,3 +1,15 @@
+function getUrlVars()
+{
+	var vars = [], hash;
+	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	for(var i = 0; i < hashes.length; i++)
+	{
+		hash = hashes[i].split('=');
+		vars.push(hash[0]);
+		vars[hash[0]] = hash[1];
+	}
+	return vars;
+}
 $(document).ready(function(){
 	
 	var content = $('#content');
@@ -13,16 +25,6 @@ $(document).ready(function(){
 	var socket = io.connect('http://ui505bv01-lps.civ.zcu.cz', {
 		reconnect: false
 	});		
-		
-	socket.on('options', function (data) {
-		setStatus("Got devices.");
-		for( var i in data.data)
-		{
-			$('#connection-type').append($('<option>', {
-				value : data.data[i].key
-			}).text(data.data[i].readable)); 
-		}
-	});
 
 	socket.on('connecting', function () {
 		setStatus("Connecting to server...");
@@ -57,6 +59,9 @@ $(document).ready(function(){
 	});
 			
 	socket.on('message', function (data) {
+		console.log("got data");
+		console.log(data);
+		
 		if ( data.content == "\b") {
 			content.val(content.val().replace(/.$/, ""));
 		}
@@ -70,6 +75,9 @@ $(document).ready(function(){
 		content.scrollTop(100000);
 	});
 		
+	content.bind("cut copy paste",function(e) {
+		e.preventDefault();
+	});
 		
 	//for special characters
 	content.keydown(function(e) {
@@ -81,7 +89,7 @@ $(document).ready(function(){
 			e.preventDefault();
 		}
 			
-		else if (e.which == 38 || e.which == 40) { //arrows
+		else if (e.which == 37 || e.which == 38 || e.which == 39 || e.which == 40  || e.which == 46) { //arrows
 			e.preventDefault();
 		}
 			
@@ -96,18 +104,12 @@ $(document).ready(function(){
 			});
 			e.preventDefault();
 		}
-	});
-		
+	});	
 	
-	
-	$('#connect').click(function() {
-		
-		$('#select').hide();
-		$('#communication').show();
-		setStatus("Connected to server, sending desired port request.");
-		socket.emit('connectTo', {
-			port: $('#connection-type option:selected').val()
-		});
+	var vars = getUrlVars();
+	var port = vars['id'];
+	socket.emit('connectTo', {
+		port: port
 	});
 	
 	

@@ -1,27 +1,34 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>WebSockets - Simple chat</title>
-
-		<link rel="stylesheet" href="./style.css">
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<script type="text/javascript" src="./jquery.js"></script>
-		<script type="text/javascript" src="./socket.io/socket.io.js"></script>
-		<script type="text/javascript" src="./client.js"></script>
-    </head>
-    <body>
+		<script type="text/javascript">
+			
+			$(document).ready(function() {
+				$('a.popup').click(function() {
+					var url = $(this).attr('href');
+					var newwindow=window.open(url,'Connection','height=500,width=800');
+					if (window.focus) {
+						newwindow.focus()
+					}
+					return false;
+	
+				});
+			});
+			
+		</script>
+	</head>
 
-		<div id="select">
-			<select name="connection-type" id="connection-type">
-			</select>
-			<input type="button" value="Connect" name="connect" id="connect">
 
-		</div>
-		<div id="communication">
-			<textarea id="content"></textarea>
-			<div id="status"></div>
-		</div>
-
-    </body>
+	<body>
+		<a href="communication.html?id=/dev/ttyUSB0" class="popup">ttyUSB0</a><br>
+		<a href="communication.html?id=/dev/ttyUSB0" class="popup">ttyUSB0 againg</a><br>
+		<a href="communication.html?id=/dev/ttyUSB0" class="popup">and ttyUSB0 again</a><br>
+	</body>
 </html>
-

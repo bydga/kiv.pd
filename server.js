@@ -1,6 +1,7 @@
 var fs = require('fs'), path = require('path'),
 http = require('http').createServer(function(request, response) { 
-	var filePath = '.' + request.url;
+	var url = require('url').parse(request.url, true)
+	var filePath = '.' + url.pathname;
 	if (filePath == './')
 		filePath = './index.html';
          
@@ -53,8 +54,7 @@ http.listen(80);
 devices = {
 	'/dev/ttyUSB0': {
 		baudrate: 9600,
-		port: null,
-		readableName: "ttyUSB0"
+		port: null
 	}
 //	,'/dev/ttyS1':
 //	{
@@ -62,7 +62,7 @@ devices = {
 //		port: null
 //	}
 };
-var allowedOrigins = ["http://ui505bv01-lps.civ.zcu.cz" ];
+
 clients = [];
 
 //init port devices
@@ -73,7 +73,6 @@ for( var deviceName in devices)
 		return function (data) {
 			for (var i = 0; i < clients.length; i++) {
 				if (clients[i].portName == name) {
-					
 					clients[i].socket.emit("message", {
 						content: data.toString()
 					});
@@ -91,19 +90,7 @@ io.sockets.on('connection', function (socket) {
 		portName: null
 	};
 	
-	var index = clients.push(connectionObject) -1;
-	
-	var devs = []
-	for (var name in devices) {
-		devs.push({
-			key: name, 
-			readable: devices[name].readableName
-		});
-	}
-	socket.emit("options", {
-		data: devs
-	});
-  
+	var index = clients.push(connectionObject) -1;  
 	socket.on('connectTo', function (data) {
     
 		connectionObject.portName = data.port;
@@ -117,7 +104,6 @@ io.sockets.on('connection', function (socket) {
     
 		var buf = new Buffer(1);
 		buf[0] = data.data;
-			
 		devices[connectionObject.portName].port.write(buf);
 	});
 	//client disconnects, remove him
@@ -128,4 +114,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 console.log("Server accepting connections.");
-repl.start("nodejs> ");
+
+
+
+//repl.start("nodejs> ");
