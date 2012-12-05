@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript">
+     
+     window.onload = function() {
+        var elms = document.getElementsByClassName('popup');
+        for(var i = 0; i < elms.length; i++) {
+          var element = elms[i];
+          element.onclick = function(elm) {
+          return function() {
+            var url = elm.href;
+            var name = elm.id;
+            var wind = window.open(url,'Connection ' +  name ,'height=500,width=800');
+            if (window.focus) {
+              wind.focus()
+            }
+            return false;
+        }
+        }(element);
+      }
+    }
+    </script>
+  </head>
+  
+  <body>
+    <img src="map.png" usemap="#imagemap" alt="" />
+    <map id="imagemap" name="imagemap">
+      <area id="/bin/bash" class="popup" shape="rect" coords="195,31,259,105" href="http://ui505bv01-lps.civ.zcu.cz:4300/" alt="" title=""    />
+      <area id="/dev/ttyUSB0" class="popup" shape="rect" coords="73,103,137,177" href="http://ui505bv01-lps.civ.zcu.cz:4200/" alt="" title=""    />
+      <area id="/bin/sh"  class="popup" shape="rect" coords="339,104,403,178" href="http://ui505bv01-lps.civ.zcu.cz:4400/" alt="" title=""    />
+    </map>       
+  </body>
+</html>

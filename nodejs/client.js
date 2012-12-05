@@ -112,5 +112,18 @@ $(document).ready(function(){
 		port: port
 	});
 	
+//	for(var i = 1; i< 15; i++)
+//	{
+//		$('<a class="cmdlink" href="#" rel="'+i+'">CTRL+' +  String.fromCharCode(64 + i) + "</a>").appendTo('#cmdwrapper');
+//	}
+//	
+//	$('.cmdlink').live('click', function(){
+//		socket.emit('message', {
+//			data: parseInt($(this).attr('rel'))
+//		});
+//		
+//		return false;
+//	});
+	
 	
 });

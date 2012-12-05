@@ -1,0 +1,43 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script type="text/javascript" src="./jquery.js"></script>
+		<script type="text/javascript">
+			
+			$(document).ready(function() {
+				$('.popup').click(function() {
+					var url = $(this).attr('href');
+					var newwindow=window.open(url,'Connection','height=500,width=800');
+					if (window.focus) {
+						newwindow.focus()
+					}
+					return false;
+	
+				});
+			});
+			
+		</script>
+	</head>
+
+
+	<body>
+		<div style="text-align:center; width:802px; margin-left:auto; margin-right:auto;">
+<img src="map.png" usemap="#imagemap" alt="" />
+<map id="imagemap" name="imagemap">
+<area class="popup" shape="rect" coords="84,46,149,118" href="communication.html?id=/dev/ttyUSB0" alt="" title=""    />
+<area class="popup" shape="rect" coords="133,209,198,281" href="communication.html?id=/dev/ttyUSB0" alt="" title=""    />
+<area class="popup" shape="rect" coords="360,68,425,140" href="communication.html?id=/dev/ttyUSB0" alt="" title=""    />
+<area class="popup" shape="rect" coords="666,65,731,137" href="communication.html?id=/dev/ttyUSB0" alt="" title=""    />
+<area class="popup" shape="rect" coords="511,229,576,301" href="communication.html?id=/dev/ttyUSB0" alt="" title=""    />
+</map>
+
+</div>
+           
+	</body>
+</html>
